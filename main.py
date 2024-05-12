@@ -36,7 +36,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
 
 
-st.title("Scholarship Chatbot")
+#st.title("Scholarship Chatbot")
 
 @st.cache_resource
 def get_chain():
@@ -89,6 +89,47 @@ Answer: """
 )
 
 client = OpenAI()
+
+## add side bar and remove the header
+st.markdown(
+    """
+    <style>
+    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
+    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
+    .viewerBadge_text__1JaDK {
+        display: none;
+    }
+    #MainMenu{ visibility: hidden; } footer { visibility: hidden; } header { visibility: hidden; }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+gradient_text_html = """
+<style>
+.gradient-text {
+    font-weight: bold;
+    background: -webkit-linear-gradient(left, red, orange);
+    background: linear-gradient(to right, red, orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline;
+    font-size: 3em;
+}
+</style>
+<div class="gradient-text">AI Scholarships Advisor</div>
+"""
+
+st.markdown(gradient_text_html, unsafe_allow_html=True)
+st.caption("Talk your way through scholarships")
+
+with open("sidebar.md", "r") as sidebar_file:
+    sidebar_content = sidebar_file.read()
+
+st.sidebar.markdown(sidebar_content)
+
+
+
 
 # Set a default model
 if "openai_model" not in st.session_state:
