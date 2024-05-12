@@ -24,12 +24,6 @@ else:
 
 print(f"Running in {env} mode")
 
-
-if OPENAI_API_KEY:
-    print("API Key is:", OPENAI_API_KEY)
-else:
-    print("API Key not found.")
-
 from langchain_community.utilities.sql_database import SQLDatabase
 from langchain.chains import create_sql_query_chain
 from langchain.memory import ChatMessageHistory
