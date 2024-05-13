@@ -21,23 +21,17 @@ else:
     OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
     LANGCHAIN_TRACING_V2 = st.secrets["LANGCHAIN_TRACING_V2"]
     LANGCHAIN_API_KEY = st.secrets["LANGCHAIN_API_KEY"]
-
 print(f"Running in {env} mode")
 
 from langchain_community.utilities.sql_database import SQLDatabase
 from langchain.chains import create_sql_query_chain
 from langchain.memory import ChatMessageHistory
-
 from operator import itemgetter
-
 from langchain_core.output_parsers import StrOutputParser
-
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
 
-
-#st.title("Scholarship Chatbot")
-
+# get chain which also connects to db and openai
 @st.cache_resource
 def get_chain():
     from langchain_openai import ChatOpenAI
@@ -54,11 +48,10 @@ def get_chain():
         result=itemgetter("query") | execute_query
     )
     | rephrase_answer
-)
-
-
+    )
     return chain
 
+#history for future use
 def create_history(messages):
     history = ChatMessageHistory()
     for message in messages:
@@ -68,6 +61,7 @@ def create_history(messages):
             history.add_ai_message(message["content"])
     return history
 
+# invoke chain which executes the question
 def invoke_chain(question):
     chain = get_chain()
    # history = create_history(messages)
@@ -78,7 +72,6 @@ def invoke_chain(question):
 
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder,FewShotChatMessagePromptTemplate,PromptTemplate
-
 answer_prompt = PromptTemplate.from_template(
     """Given the following user question, corresponding SQL query, and SQL result, answer the user question.
 
@@ -90,7 +83,7 @@ Answer: """
 
 client = OpenAI()
 
-## add side bar and remove the header
+## workaround to remove the header
 st.markdown(
     """
     <style>
@@ -105,6 +98,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# better title display
 gradient_text_html = """
 <style>
 .gradient-text {
@@ -119,17 +113,15 @@ gradient_text_html = """
 </style>
 <div class="gradient-text">AI Scholarships Advisor</div>
 """
-
 st.markdown(gradient_text_html, unsafe_allow_html=True)
+
 st.caption("Talk your way through scholarships")
 
+#side bar with instructions
 with open("sidebar.md", "r") as sidebar_file:
     sidebar_content = sidebar_file.read()
 
 st.sidebar.markdown(sidebar_content)
-
-
-
 
 # Set a default model
 if "openai_model" not in st.session_state:
@@ -144,20 +136,6 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-st.markdown(
-    """
-    <style>
-    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-    .viewerBadge_text__1JaDK {
-        display: none;
-    }
-    #MainMenu{ visibility: hidden; } footer { visibility: hidden; } header { visibility: hidden; }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # Accept user input
 prompt = st.chat_input("What is up? just enter your questions..")
